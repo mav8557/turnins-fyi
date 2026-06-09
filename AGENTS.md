@@ -115,6 +115,11 @@ BACKEND_URL=https://turnins-fyi.fly.dev trunk build --release
 # output in frontend/dist/
 ```
 
+## Future work
+
+- **Switch from OpenSSL to rustls** — the backend currently depends on `openssl-sys`, which requires `pkg-config` and `libssl-dev` in the Docker build. Enabling the `rustls-tls` feature on `reqwest` (and disabling `default-features`) would remove the native OpenSSL dependency and simplify the Dockerfile.
+- **Implement dependency caching in CI** - the frontend builds in particular were taking pretty long (10 minutes)
+
 ## Universalis rate limits
 
 The backend respects Universalis's 8-concurrent-request limit via `tokio::sync::Semaphore`. Item IDs are chunked into batches of 100 per request. A full refresh fetches all ~2500 items across ~26 requests in roughly 4 parallel rounds.
