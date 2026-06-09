@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 /// One market board listing returned by Universalis.
