@@ -1,0 +1,5 @@
+# flyctl launch added from .gitignore
+target
+frontend/dist
+**/data/gc_supply_raw.json
+fly.toml
