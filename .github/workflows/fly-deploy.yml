@@ -1,19 +1,15 @@
-name: Deploy Backend
+# See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
 
+name: Fly Deploy
 on:
   push:
-    branches: [stable]
-    paths:
-      - 'backend/**'
-      - 'shared/**'
-      - 'data/items.json'
-      - 'Dockerfile'
-      - 'fly.toml'
-
+    branches:
+      - stable
 jobs:
   deploy:
-    name: Deploy to fly.io
+    name: Deploy app
     runs-on: ubuntu-latest
+    concurrency: deploy-group    # optional: ensure only one action runs at a time
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
