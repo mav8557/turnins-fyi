@@ -48,14 +48,14 @@ fn cheapest_hq<'a>(listings: &'a [Listing], required: u32) -> Option<&'a Listing
     listings
         .iter()
         .filter(|l| l.hq && l.quantity >= required)
-        .min_by_key(|l| l.price_per_unit)
+        .min_by_key(|l| l.price_per_unit * l.quantity)
 }
 
 fn cheapest_nq<'a>(listings: &'a [Listing], required: u32) -> Option<&'a Listing> {
     listings
         .iter()
         .filter(|l| !l.hq && l.quantity >= required)
-        .min_by_key(|l| l.price_per_unit)
+        .min_by_key(|l| l.price_per_unit * l.quantity)
 }
 
 fn format_gil(n: u32) -> String {
