@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>turnins.fyi — FFXIV Grand Company Supply Prices</title>
+  <link data-trunk rel="rust">
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --surface2: #0f3460;
+      --accent: #e94560;
+      --text: #eaeaea;
+      --text-dim: #888;
+      --good: #4caf7d;
+      --border: #334;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; min-height: 100vh; }
+    header { background: var(--surface2); padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.4rem; color: var(--accent); }
+    header span { color: var(--text-dim); font-size: 0.9rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: 1rem; padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .controls label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dim); }
+    .controls select, .controls input { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 0.4rem 0.6rem; border-radius: 4px; font-size: 0.95rem; }
+    .controls input[type=number] { width: 5rem; }
+    .job-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 1rem 2rem 0; }
+    .job-tabs button { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+    .job-tabs button.active { background: var(--surface2); border-color: var(--accent); color: var(--text); }
+    .main { padding: 1.5rem 2rem; }
+    .items-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+    .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+    .item-name { font-weight: 600; margin-bottom: 0.4rem; }
+    .item-meta { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.6rem; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; }
+    .price { font-size: 1.1rem; color: var(--good); font-weight: 600; }
+    .price-detail { font-size: 0.8rem; color: var(--text-dim); }
+    .world { font-size: 0.8rem; color: var(--text-dim); text-align: right; }
+    .no-listing { color: var(--accent); font-size: 0.9rem; }
+    .hq-badge { display: inline-block; background: #b8860b; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; letter-spacing: 0.03em; }
+    .nq-badge { display: inline-block; background: var(--text-dim); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; letter-spacing: 0.03em; }
+    .nq-price { color: var(--text-dim) !important; }
+    .nq-alt { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.35rem; }
+    .nq-note { font-size: 0.75rem; color: var(--accent); margin-top: 0.2rem; opacity: 0.8; }
+    .loading { color: var(--text-dim); padding: 2rem; text-align: center; }
+    .stale-notice { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 1rem; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1rem; }
+    .separator { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+    @media (max-width: 600px) { .main { padding: 1rem; } .controls { padding: 0.75rem 1rem; } .job-tabs { padding: 0.75rem 1rem 0; } }
+  </style>
+</head>
+<body>
+</body>
+</html>

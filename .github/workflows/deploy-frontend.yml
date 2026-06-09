@@ -1,0 +1,36 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+
+jobs:
+  deploy:
+    name: Build and deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust WASM target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install trunk
+        run: cargo install trunk
+
+      - name: Build
+        working-directory: frontend
+        run: trunk build --release
+        env:
+          BACKEND_URL: https://turnins-fyi.fly.dev
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+          cname: turnins.fyi
