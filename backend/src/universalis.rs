@@ -8,14 +8,14 @@ use tracing::{error, info};
 use shared::Listing;
 
 /// Fetches market listings from Universalis for all given item IDs in a datacenter.
-/// Respects the 8-concurrent-request limit via semaphore.
+/// `sem` is a shared semaphore (8 permits) that spans all concurrent DC fetches.
 /// Returns a map of item_id → listings sorted by price_per_unit ascending.
 pub async fn fetch_all(
     client: &Client,
+    sem: &Arc<Semaphore>,
     dc: &str,
     item_ids: &[u32],
 ) -> HashMap<u32, Vec<Listing>> {
-    let sem = Arc::new(Semaphore::new(8));
     let chunks: Vec<Vec<u32>> = item_ids.chunks(100).map(|c| c.to_vec()).collect();
 
     let mut handles = Vec::with_capacity(chunks.len());

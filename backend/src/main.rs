@@ -16,7 +16,7 @@ use axum::{
 };
 use reqwest::Client;
 use serde::Deserialize;
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, Semaphore};
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
@@ -50,6 +50,8 @@ struct AppState {
     /// One cache entry per DC name (lowercase).
     caches: HashMap<String, Arc<RwLock<PriceCache>>>,
     http: Client,
+    /// Shared across all concurrent DC fetches to respect Universalis's 8-request limit.
+    universalis_sem: Arc<Semaphore>,
 }
 
 // ── Entry point ────────────────────────────────────────────────────────────
@@ -74,6 +76,7 @@ async fn main() {
         item_data,
         caches,
         http: Client::new(),
+        universalis_sem: Arc::new(Semaphore::new(8)),
     });
 
     let cors = CorsLayer::new()
@@ -144,9 +147,10 @@ async fn prices_handler(
         let http = state.http.clone();
         let dc = q.dc.clone();
         let item_ids: Vec<u32> = state.item_data.all_item_ids.clone();
+        let sem = Arc::clone(&state.universalis_sem);
         tokio::spawn(async move {
             info!("Starting Universalis fetch for DC {dc}");
-            let new_data = universalis::fetch_all(&http, &dc, &item_ids).await;
+            let new_data = universalis::fetch_all(&http, &sem, &dc, &item_ids).await;
             let mut cache = cache_lock2.write().await;
             cache.data = new_data;
             cache.last_fetched = Some(Instant::now());
