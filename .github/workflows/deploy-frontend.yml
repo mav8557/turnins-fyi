@@ -19,8 +19,11 @@ jobs:
       - name: Install Rust WASM target
         run: rustup target add wasm32-unknown-unknown
 
-      - name: Install trunk
-        run: cargo install trunk
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: jetli/trunk-action@v0.5.1
+        with:
+          version: 'latest'
 
       - name: Build
         working-directory: frontend
