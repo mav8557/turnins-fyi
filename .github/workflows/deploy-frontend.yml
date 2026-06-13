@@ -6,6 +6,7 @@ on:
     paths:
       - 'frontend/**'
       - 'shared/**'
+      - '.github/**'
 
 jobs:
   deploy:
