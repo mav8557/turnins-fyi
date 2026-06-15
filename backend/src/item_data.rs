@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use shared::{JobLevel, TurnInItem};
+use shared::TurnInItem;
 
 /// Mirrors the structure of data/items.json.
 #[derive(Debug, Deserialize)]
@@ -94,31 +94,22 @@ impl ItemData {
         })
     }
 
-    /// Returns the turn-in pool for a given (level, job).
-    pub fn items_for(&self, level: u8, class_job_id: u8) -> Option<&Vec<TurnInItem>> {
-        self.pool.get(&(level, class_job_id))
+    /// Returns the turn-in pool for a given (level, job) as a slice.
+    pub fn pool_for(&self, class_job_id: u8, level: u8) -> &[TurnInItem] {
+        self.pool
+            .get(&(level, class_job_id))
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
     }
 
-    /// Builds a JobLevel list for a given level, one entry per DoH/DoL job.
-    pub fn jobs_at_level(&self, level: u8) -> Vec<JobLevel> {
-        let mut result = Vec::new();
-        // Jobs sorted by class_job_id ascending (8=CRP … 18=FSH)
-        let mut job_ids: Vec<u8> = self.jobs.keys().copied().collect();
-        job_ids.sort();
-        for cj_id in job_ids {
-            let meta = &self.jobs[&cj_id];
-            let items = self
-                .pool
-                .get(&(level, cj_id))
-                .cloned()
-                .unwrap_or_default();
-            result.push(JobLevel {
-                class_job_id: cj_id,
-                name: meta.name.clone(),
-                abbr: meta.abbr.clone(),
-                items,
-            });
-        }
-        result
+    /// For each of the 11 jobs, pairs job metadata with the pool for a given (clamped) level.
+    pub fn job_pools<'a>(&'a self, levels: &[(u8, u8); 11]) -> Vec<(u8, &'a JobMeta, u8, &'a [TurnInItem])> {
+        levels
+            .iter()
+            .map(|&(cj_id, level)| {
+                let level = level.clamp(1, 100);
+                (cj_id, &self.jobs[&cj_id], level, self.pool_for(cj_id, level))
+            })
+            .collect()
     }
 }

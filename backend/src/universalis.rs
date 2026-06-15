@@ -5,7 +5,14 @@ use serde::Deserialize;
 use tokio::sync::Semaphore;
 use tracing::{error, info};
 
-use shared::Listing;
+/// One market board listing returned by Universalis.
+#[derive(Debug, Clone)]
+pub struct Listing {
+    pub price_per_unit: u32,
+    pub quantity: u32,
+    pub world_name: String,
+    pub hq: bool,
+}
 
 /// Fetches market listings from Universalis for all given item IDs in a datacenter.
 /// `sem` is a shared semaphore (8 permits) that spans all concurrent DC fetches.
