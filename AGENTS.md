@@ -148,6 +148,7 @@ BACKEND_URL=https://turnins-fyi.fly.dev trunk build --release
 - **Implement dependency caching in CI** - the frontend builds in particular were taking pretty long (10 minutes)
 - **Lock down CORS in production** — the backend currently allows any origin (`CorsLayer::new().allow_origin(Any)`). Read an `ALLOWED_ORIGIN` env var at startup: if set use `AllowOrigin::exact(...)`, otherwise fall back to `Any` for local dev. Set `ALLOWED_ORIGIN=https://turnins.fyi` in `fly.toml` under `[env]`.
 - **Support multiple small listings** - Show optional smaller listings - can be cheaper than a single-stack option, or the user might only need 1 or 2 of an item to complete the stack. Should do this for HQ and NQ.
+- **Send all listings to the frontend** - Currently the backend resolves the cheapest HQ/NQ listing per item server-side (`pricing::best_listings`) and only sends those two winners in `PricedItem`. Consider sending the full per-world listing snapshot (price/qty/world/datacenter/hq) for each item instead, with "best" HQ/NQ selection (and any multi-listing UI from the item above) happening client-side.
 - **List generation** - Selection mechanism ("My List") is implemented as a flat list. Future: group selected items by world/datacenter and compute an optimized shopping route (start at one DC/world, visit all items there, then teleport to the next DC/world, etc.). 
 - **Fix data retrieval** - It should be an every 15-minute job on the backend to scrape everything, ideally configured in a constant or environment variable
 

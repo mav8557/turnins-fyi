@@ -1,10 +1,11 @@
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use tokio::sync::RwLock;
+use reqwest::Client;
+use tokio::sync::{RwLock, Semaphore};
 use tracing::info;
 
 use crate::universalis;
@@ -62,8 +63,52 @@ pub fn best_listings(
     (hq_best, nq_best)
 }
 
-/// Orchestrates the full response: job pools -> needed items -> ensure_fresh ->
-/// snapshot -> best listings per item -> response with dc_status.
+// ── Background refresh ───────────────────────────────────────────────────
+
+const DEFAULT_REFRESH_INTERVAL_SECS: u64 = 15 * 60;
+
+/// How often each datacenter's cache is refreshed in the background.
+/// Configurable via the `REFRESH_INTERVAL_SECS` env var.
+pub(crate) fn refresh_interval() -> Duration {
+    std::env::var("REFRESH_INTERVAL_SECS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .map(Duration::from_secs)
+        .unwrap_or(Duration::from_secs(DEFAULT_REFRESH_INTERVAL_SECS))
+}
+
+fn now_unix() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+}
+
+/// Fetches fresh listings for `dc` and merges them into the cache. Items
+/// missing from the new data (e.g. a failed chunk) keep their previously
+/// cached listings instead of being wiped.
+pub(crate) async fn refresh_dc(
+    http: &Client,
+    sem: &Arc<Semaphore>,
+    item_ids: &[u32],
+    cache_lock: &Arc<RwLock<crate::PriceCache>>,
+    dc: &str,
+) {
+    {
+        cache_lock.write().await.fetching = true;
+    }
+    info!("Starting Universalis refresh for DC {dc}");
+    let new_data = universalis::fetch_all(http, sem, dc, item_ids).await;
+    let mut cache = cache_lock.write().await;
+    cache.data.extend(new_data);
+    cache.last_fetched_unix = Some(now_unix());
+    cache.fetching = false;
+    info!("Universalis refresh complete for DC {dc}");
+}
+
+/// Orchestrates the full response: job pools -> needed items -> bootstrap
+/// fetch if needed -> snapshot -> best listings per item -> response with
+/// dc_status.
 pub async fn build_response(
     state: &crate::AppState,
     req: &PricesRequest,
@@ -80,38 +125,24 @@ pub async fn build_response(
         }
     }
 
-    // Ensure fresh data in each requested DC (fire-and-forget)
-    let item_ids_vec: Vec<u32> = state.item_data.all_item_ids.clone();
+    // Bootstrap: if a requested DC has never been fetched yet (e.g. right
+    // after a cold start), kick off an immediate fetch instead of waiting
+    // for its staggered slot in the periodic refresh loop.
     for (dc_key, canonical_dc) in requested_dcs {
         if let Some(cache_lock) = state.caches.get(dc_key) {
-            // Check if refresh is needed
             let needs_refresh = {
                 let cache = cache_lock.read().await;
                 !cache.fetching && cache.last_fetched_unix.is_none()
             };
             if needs_refresh {
-                let cache_lock2 = Arc::clone(cache_lock);
-                {
-                    let mut cache = cache_lock2.write().await;
-                    cache.fetching = true;
-                }
+                cache_lock.write().await.fetching = true;
                 let http = state.http.clone();
                 let sem = Arc::clone(&state.universalis_sem);
+                let ids = state.item_data.all_item_ids.clone();
+                let cache_lock = Arc::clone(cache_lock);
                 let dc = canonical_dc.clone();
-                let ids = item_ids_vec.clone();
                 tokio::spawn(async move {
-                    info!("Starting Universalis fetch for DC {dc}");
-                    let new_data = universalis::fetch_all(&http, &sem, &dc, &ids).await;
-                    let mut cache = cache_lock2.write().await;
-                    cache.data = new_data;
-                    cache.last_fetched_unix = Some(
-                        SystemTime::now()
-                            .duration_since(UNIX_EPOCH)
-                            .unwrap_or_default()
-                            .as_secs(),
-                    );
-                    cache.fetching = false;
-                    info!("Universalis fetch complete for DC {dc}");
+                    refresh_dc(&http, &sem, &ids, &cache_lock, &dc).await;
                 });
             }
         }

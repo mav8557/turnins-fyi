@@ -83,6 +83,36 @@ async fn main() {
         universalis_sem: Arc::new(Semaphore::new(8)),
     });
 
+    // Spawn a staggered, recurring refresh loop for each datacenter so the
+    // cache stays warm in the background instead of relying on requests.
+    let interval = pricing::refresh_interval();
+    let stagger = interval / DATACENTERS.len() as u32;
+    for (i, (dc_name, _)) in DATACENTERS.iter().enumerate() {
+        let state = Arc::clone(&state);
+        let dc_name = dc_name.to_string();
+        let cache_lock = state
+            .caches
+            .get(&dc_name.to_lowercase())
+            .expect("cache for known DC")
+            .clone();
+        let start = tokio::time::Instant::now() + stagger * i as u32;
+        tokio::spawn(async move {
+            let mut tick = tokio::time::interval_at(start, interval);
+            tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+            loop {
+                tick.tick().await;
+                pricing::refresh_dc(
+                    &state.http,
+                    &state.universalis_sem,
+                    &state.item_data.all_item_ids,
+                    &cache_lock,
+                    &dc_name,
+                )
+                .await;
+            }
+        });
+    }
+
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
