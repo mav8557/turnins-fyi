@@ -291,10 +291,8 @@ fn App() -> impl IntoView {
                     p.dc_status.values().find_map(|s| s.last_updated)
                 });
 
-                let show_stale = prices.as_ref().map(|p| {
-                    p.dc_status
-                        .values()
-                        .any(|s| s.last_updated.is_none() || s.fetching)
+                let show_stale = prices.as_ref().is_some_and(|p| {
+                    last_updated.is_none() && p.dc_status.values().any(|s| s.fetching)
                 });
 
                 view! {
@@ -313,7 +311,7 @@ fn App() -> impl IntoView {
                         }}
                     </Show>
 
-                    {if show_stale.unwrap_or(false) {
+                    {if show_stale {
                         view! {
                             <div class="stale-notice">
                                 "Fetching prices from Universalis — check back in a moment."
