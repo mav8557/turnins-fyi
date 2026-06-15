@@ -57,9 +57,9 @@ async fn fetch_chunk(
         .collect::<Vec<_>>()
         .join(",");
 
-    // entries=0 to skip sale history; omit listings cap so all listings are returned.
+    // listings=20 caps memory per item; entries=0 skips sale history.
     let url = format!(
-        "https://universalis.app/api/v2/{dc}/{ids_str}?entries=0"
+        "https://universalis.app/api/v2/{dc}/{ids_str}?listings=20&entries=0"
     );
 
     let resp = match client.get(&url).send().await {
