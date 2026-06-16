@@ -344,6 +344,7 @@ fn App() -> impl IntoView {
                                     <div class="job-panel-header">
                                         <span class="job-abbr">{abbr}</span>
                                         <div class="level-stepper">
+                                            <span class="level-label">"Level"</span>
                                             <button on:click=move |_| adjust_level(cj_id, -1)>
                                                 "−"
                                             </button>
