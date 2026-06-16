@@ -436,7 +436,15 @@ fn App() -> impl IntoView {
                                                                             view! {}.into_any()
                                                                         }}
                                                                         <div class="item-name">
-                                                                            {item.item_name.clone()}
+                                                                            <a
+                                                                                class="item-link"
+                                                                                href=format!("https://universalis.app/market/{item_id}")
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                on:click=|ev| ev.stop_propagation()
+                                                                            >
+                                                                                {item.item_name.clone()}
+                                                                            </a>
                                                                         </div>
                                                                         <div class="item-meta">
                                                                             "Requires: "
