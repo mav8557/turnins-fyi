@@ -13,8 +13,8 @@
   <meta name="theme-color" content="#e94560">
   
 <script type="module">
-import init, * as bindings from '/frontend-d3209e8c83a33ae2.js';
-const wasm = await init({ module_or_path: '/frontend-d3209e8c83a33ae2_bg.wasm' });
+import init, * as bindings from '/frontend-f60887d403decb2a.js';
+const wasm = await init({ module_or_path: '/frontend-f60887d403decb2a_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -65,6 +65,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     .job-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .job-abbr { font-size: 1.2rem; font-weight: 700; color: var(--accent); min-width: 2rem; text-align: center; }
     .level-stepper { display: flex; align-items: center; gap: 0.3rem; }
+    .level-stepper .level-label { color: var(--text-dim); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 0.2rem; }
     .level-stepper input[type=number] { width: 3.5rem; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 0.3rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
     .level-stepper button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
     .level-stepper button:hover { border-color: var(--accent); }
@@ -91,7 +92,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     .separator { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
     @media (max-width: 600px) { .main { padding: 1rem; } .controls { padding: 0.75rem 1rem; } .job-panel { margin-bottom: 1rem; } .my-list-panel { margin: 1rem 1rem 0; } }
   </style>
-<link rel="modulepreload" href="/frontend-d3209e8c83a33ae2.js" crossorigin="anonymous" integrity="sha384-TweFkHChL2FEtkyeb5V24Wbs0IIBqBW6KvGbwv8WRw5t+lS9TsMm+Xl1ZvMoiFUy"><link rel="preload" href="/frontend-d3209e8c83a33ae2_bg.wasm" crossorigin="anonymous" integrity="sha384-DAf0G2KTqaUlQZRNTcJTUqWOD911tmJw0MT6Lh1W9XZBqSIvTOsCieEhNVYuZyEf" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/frontend-f60887d403decb2a.js" crossorigin="anonymous" integrity="sha384-TweFkHChL2FEtkyeb5V24Wbs0IIBqBW6KvGbwv8WRw5t+lS9TsMm+Xl1ZvMoiFUy"><link rel="preload" href="/frontend-f60887d403decb2a_bg.wasm" crossorigin="anonymous" integrity="sha384-S1LfiMUihzl+UQzpZywDPoa45ZPpORh015SsBDDvNJu+dTjQkPSNZJqwNZO2LkLX" as="fetch" type="application/wasm"></head>
 <body>
 </body>
 </html>
