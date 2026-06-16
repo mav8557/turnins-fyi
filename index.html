@@ -6,8 +6,8 @@
   <title>turnins.fyi — FFXIV GC Mission Item Prices</title>
   
 <script type="module">
-import init, * as bindings from '/frontend-4ee47b906fd8915f.js';
-const wasm = await init({ module_or_path: '/frontend-4ee47b906fd8915f_bg.wasm' });
+import init, * as bindings from '/frontend-d3209e8c83a33ae2.js';
+const wasm = await init({ module_or_path: '/frontend-d3209e8c83a33ae2_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -66,6 +66,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     .item-card:hover { border-color: var(--good); }
     .item-card.today { border-color: var(--good); }
     .item-card.selected { border-color: var(--good); background: var(--surface2); }
+	.item-link { color: white }
     .today-badge { display: inline-block; background: var(--good); color: #000; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 3px; margin-right: 0.4rem; letter-spacing: 0.03em; }
     .item-name { font-weight: 600; margin-bottom: 0.4rem; }
     .item-meta { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.6rem; }
@@ -83,7 +84,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     .separator { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
     @media (max-width: 600px) { .main { padding: 1rem; } .controls { padding: 0.75rem 1rem; } .job-panel { margin-bottom: 1rem; } .my-list-panel { margin: 1rem 1rem 0; } }
   </style>
-<link rel="modulepreload" href="/frontend-4ee47b906fd8915f.js" crossorigin="anonymous" integrity="sha384-HVEPgGUNbP7aPC4FasLBIjnaq1ly3z2k+JouJ/JefXyOS82MrwquQCNko6iji3wn"><link rel="preload" href="/frontend-4ee47b906fd8915f_bg.wasm" crossorigin="anonymous" integrity="sha384-26eSPxJGKEJVGLqutQ0ENKilvZ2ncfI29Ns3wchQa48xOD568csz8mUwt2BQHhQv" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/frontend-d3209e8c83a33ae2.js" crossorigin="anonymous" integrity="sha384-TweFkHChL2FEtkyeb5V24Wbs0IIBqBW6KvGbwv8WRw5t+lS9TsMm+Xl1ZvMoiFUy"><link rel="preload" href="/frontend-d3209e8c83a33ae2_bg.wasm" crossorigin="anonymous" integrity="sha384-DAf0G2KTqaUlQZRNTcJTUqWOD911tmJw0MT6Lh1W9XZBqSIvTOsCieEhNVYuZyEf" as="fetch" type="application/wasm"></head>
 <body>
 </body>
 </html>
