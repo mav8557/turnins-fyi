@@ -83,8 +83,32 @@ async fn main() {
         universalis_sem: Arc::new(Semaphore::new(8)),
     });
 
+    // Warm-up: immediately fetch all DCs on startup so every cache is
+    // populated as soon as possible. The shared semaphore caps concurrency
+    // at 8, so Universalis rate limits are still respected.
+    for (dc_name, _) in DATACENTERS.iter() {
+        let state = Arc::clone(&state);
+        let dc_name = dc_name.to_string();
+        let cache_lock = state
+            .caches
+            .get(&dc_name.to_lowercase())
+            .expect("cache for known DC")
+            .clone();
+        tokio::spawn(async move {
+            pricing::refresh_dc(
+                &state.http,
+                &state.universalis_sem,
+                &state.item_data.all_item_ids,
+                &cache_lock,
+                &dc_name,
+            )
+            .await;
+        });
+    }
+
     // Spawn a staggered, recurring refresh loop for each datacenter so the
-    // cache stays warm in the background instead of relying on requests.
+    // cache stays warm in the background. Start after one full interval so
+    // the loops don't immediately re-fetch what the warm-up just populated.
     let interval = pricing::refresh_interval();
     let stagger = interval / DATACENTERS.len() as u32;
     for (i, (dc_name, _)) in DATACENTERS.iter().enumerate() {
@@ -95,7 +119,7 @@ async fn main() {
             .get(&dc_name.to_lowercase())
             .expect("cache for known DC")
             .clone();
-        let start = tokio::time::Instant::now() + stagger * i as u32;
+        let start = tokio::time::Instant::now() + interval + stagger * i as u32;
         tokio::spawn(async move {
             let mut tick = tokio::time::interval_at(start, interval);
             tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
